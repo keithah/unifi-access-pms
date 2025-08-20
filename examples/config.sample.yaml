@@ -1,0 +1,186 @@
+# UniFi Access PMS Configuration Sample
+# Copy this file to config.yaml and customize for your setup
+
+core:
+  # List of enabled providers
+  enabled_providers:
+    - hospitable
+    - ics
+  
+  # Default check-in/out times
+  default_check_in_time: "15:00"
+  default_check_out_time: "11:00"
+  
+  # PIN generation method: phone_based, random, sequential, custom
+  pin_generation_method: phone_based
+  
+  # PIN code length (4-8 digits)
+  pin_length: 6
+  
+  # Sync interval in seconds
+  sync_interval: 300
+  
+  # Default timezone
+  timezone: "America/New_York"
+
+# UniFi Access Controller Settings
+unifi:
+  # UniFi Controller API endpoint
+  api_host: "${UNIFI_API_HOST:https://unifi-controller.local}"
+  
+  # API token for UniFi Access
+  api_token: "${UNIFI_API_TOKEN}"
+  
+  # SSL verification
+  verify_ssl: true
+  
+  # Request timeout in seconds
+  timeout: 30
+  
+  # Default visitor access duration in days
+  default_visitor_duration: 7
+
+# Provider Configurations
+providers:
+  # Hospitable PMS Integration
+  hospitable:
+    enabled: true
+    config:
+      # Hospitable API credentials
+      api_key: "${HOSPITABLE_API_KEY}"
+      api_url: "https://api.hospitable.com/v2"
+      
+      # Webhook configuration for real-time updates
+      webhook_enabled: true
+      webhook_secret: "${HOSPITABLE_WEBHOOK_SECRET}"
+      
+      # Map Hospitable property IDs to UniFi door group IDs
+      property_mappings:
+        "property-123": "door-group-456"
+        "property-789": "door-group-101"
+    
+    # Provider-specific settings
+    priority: 100
+    retry_attempts: 3
+    retry_delay: 60
+    timeout: 30
+
+  # ICS Calendar Feed Integration
+  ics:
+    enabled: true
+    config:
+      # Calendar feed URLs
+      feeds:
+        airbnb: "https://www.airbnb.com/calendar/ical/12345.ics"
+        vrbo: "https://www.homeaway.com/vacation-rental/p12345/calendar.ics"
+        booking: "https://admin.booking.com/hotel/hoteladmin/ical.html?id=12345"
+      
+      # Feed refresh interval in seconds
+      refresh_interval: 3600
+      
+      # Timezone for calendar events
+      timezone: "America/New_York"
+      
+      # Map feed names to property/door group IDs
+      property_mappings:
+        airbnb: "door-group-456"
+        vrbo: "door-group-456" 
+        booking: "door-group-789"
+    
+    priority: 90
+    retry_attempts: 2
+    timeout: 15
+
+# Notification Settings
+notifications:
+  # List of enabled notification channels
+  enabled_channels:
+    - simplepush
+    # - matrix
+    # - slack
+    # - discord
+  
+  # Default notification level: info, warning, error, success
+  default_level: "info"
+  
+  # Aggregate error notifications
+  aggregate_errors: true
+  aggregate_interval: 300
+
+  # Channel Configurations
+  channels:
+    # Simplepush - Simple mobile push notifications
+    simplepush:
+      enabled: true
+      config:
+        key: "${SIMPLEPUSH_KEY}"
+        url: "https://api.simplepush.io/send"
+      
+      # Events to send notifications for
+      events: ["error", "success", "visitor_created"]
+      
+      # Rate limit: messages per minute
+      rate_limit: 10
+
+    # Matrix - Decentralized messaging protocol
+    matrix:
+      enabled: false
+      config:
+        homeserver: "https://matrix.org"
+        access_token: "${MATRIX_ACCESS_TOKEN}"
+        room_id: "${MATRIX_ROOM_ID}"
+        username: "@unifi-access-bot:matrix.org"
+      
+      events: ["error", "warning", "success"]
+
+    # Slack - Workspace integration
+    slack:
+      enabled: false
+      config:
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#property-alerts"
+        username: "UniFi Access Bot"
+        icon_emoji: ":house:"
+      
+      events: ["error", "sync_success", "visitor_created"]
+
+    # Discord - Server integration
+    discord:
+      enabled: false
+      config:
+        webhook_url: "${DISCORD_WEBHOOK_URL}"
+        username: "UniFi Access Bot"
+        avatar_url: "https://ui.com/assets/logos/ui-logo.svg"
+      
+      events: ["all"]  # Send all events
+
+# Security Settings
+security:
+  # Encrypt sensitive credentials in config file
+  encrypt_credentials: true
+  
+  # File to store encrypted credentials
+  credential_file: ".credentials"
+  
+  # Log sensitive data (disable in production)
+  log_sensitive_data: false
+  
+  # API key rotation interval in days
+  api_key_rotation_days: 90
+
+# Logging Configuration
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+  
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Log file path (optional)
+  file: "unifi-access-pms.log"
+  
+  # Max log file size in bytes
+  max_file_size: 10485760  # 10MB
+  
+  # Number of backup files to keep
+  backup_count: 5

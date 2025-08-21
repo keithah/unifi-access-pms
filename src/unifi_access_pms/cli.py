@@ -53,12 +53,20 @@ def create_config(output: str):
             }
         },
         'notifications': {
-            'enabled_channels': ['simplepush'],
+            'enabled_channels': ['simplepush', 'matrix'],
             'channels': {
                 'simplepush': {
                     'enabled': True,
                     'config': {
                         'key': 'your_simplepush_key'
+                    }
+                },
+                'matrix': {
+                    'enabled': True,
+                    'config': {
+                        'homeserver': 'matrix.org',
+                        'access_token': 'your_matrix_access_token',
+                        'room_id': '!your_room_id:matrix.org'
                     }
                 }
             }
